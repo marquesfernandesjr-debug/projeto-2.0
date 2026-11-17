@@ -1,4 +1,4 @@
-name: Compilar Executável Independente (Windows)
+name: Compilar Executável Independente (Windows 7+)
 
 on:
   push:
@@ -12,9 +12,17 @@ jobs:
     - name: Copiar código do repositório
       uses: actions/checkout@v4
 
+    - name: Configurar compilador compatível com Windows 7 (MinGW64 / MSVCRT)
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: true
+        install: mingw-w64-x86_64-gcc
+
     - name: Compilar com bibliotecas estáticas (-static)
+      shell: msys2 {0}
       run: |
-        g++ -static main.cpp Aluno.cpp Encarregado.cpp GestorEscola.cpp -o sistema.exe
+        g++ -std=c++17 -O3 -static -static-libgcc -static-libstdc++ main.cpp Aluno.cpp Encarregado.cpp GestorEscola.cpp -o sistema.exe
 
     - name: Guardar o Executável (.exe)
       uses: actions/upload-artifact@v4
